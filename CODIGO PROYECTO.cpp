@@ -1,21 +1,21 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <random>
-#include <chrono>
-#include <iomanip>
+#include <iostream>  
+#include <vector>  
+#include <algorithm>  
+#include <random>  
+#include <chrono>  
+#include <iomanip>  
 
-#ifdef _WIN32
-#include <windows.h>
+#ifdef _WIN32  
+#include <windows.h>  
 void SetColor(int color) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 void setupConsoleUTF8() {
     SetConsoleOutputCP(CP_UTF8);
 }
-#else
-#include <unistd.h>
-#include <term.h>
+#else  
+#include <unistd.h>  
+#include <term.h>  
 void SetColor(int color) {
     if (!cur_term) {
         int result;
@@ -26,7 +26,7 @@ void SetColor(int color) {
     printf("\033[%dm", color);
 }
 void setupConsoleUTF8() {}
-#endif
+#endif  
 
 using namespace std;
 
@@ -45,9 +45,8 @@ private:
     int bet;
 
     void initializeDeck() {
-        vector<string> suits = { "C", "D", "T", "P" }; // Cors, Diamants, Trèvols, Piques (ASCII simplificat)
+        vector<string> suits = { "C", "D", "T", "P" }; // Cors, Diamants, Trèvols, Piques  
         vector<string> ranks = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
-
         for (const auto& suit : suits) {
             for (int i = 0; i < ranks.size(); ++i) {
                 int value = i + 1;
@@ -55,7 +54,6 @@ private:
                 deck.push_back({ suit, ranks[i], value });
             }
         }
-
         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
         shuffle(deck.begin(), deck.end(), default_random_engine(seed));
     }
@@ -87,7 +85,6 @@ private:
 
     void displayCardsSideBySide(const vector<Card>& hand, bool hideFirst = false) {
         vector<string> topBottom, valueTop, middle, suit, valueBottom, lowBottom;
-
         for (size_t i = 0; i < hand.size(); ++i) {
             if (i == 0 && hideFirst) {
                 topBottom.push_back("┌───────┐");
@@ -106,7 +103,6 @@ private:
                 lowBottom.push_back("└───────┘");
             }
         }
-
         for (const auto& line : { topBottom, valueTop, middle, suit, middle, valueBottom, lowBottom }) {
             for (const auto& segment : line) {
                 cout << segment << " ";
@@ -121,9 +117,10 @@ public:
     }
 
     void playRound() {
-        SetColor(14); // Amarillo
+        SetColor(14); // Amarillo  
         cout << "Tienes " << playerChips << " fichas." << endl;
-        SetColor(15); // Blanco
+        SetColor(15); // Blanco  
+
         do {
             cout << "Cuanto quieres apostar? ";
             cin >> bet;
@@ -131,45 +128,43 @@ public:
 
         playerHand.clear();
         dealerHand.clear();
-
         playerHand.push_back(dealCard());
         dealerHand.push_back(dealCard());
         playerHand.push_back(dealCard());
         dealerHand.push_back(dealCard());
 
         while (true) {
-            SetColor(11); // Cyan
+            SetColor(11); // Cyan  
             cout << "Tu mano: " << endl;
-            SetColor(15); // Blanco
+            SetColor(15); // Blanco  
             displayCardsSideBySide(playerHand);
             cout << "Valor de tu mano: " << calculateHandValue(playerHand) << endl;
 
-            SetColor(11); // Cyan
+            SetColor(11); // Cyan  
             cout << "Mano del crupier: " << endl;
-            SetColor(15); // Blanco
+            SetColor(15); // Blanco  
             displayCardsSideBySide(dealerHand, true);
 
             char choice;
             cout << "Quieres otra carta? (s/n): ";
             cin >> choice;
-
             if (choice == 'n' || choice == 'N') break;
 
             playerHand.push_back(dealCard());
             if (calculateHandValue(playerHand) > 21) {
-                SetColor(12); // Rojo
+                SetColor(12); // Rojo  
                 cout << "Tu mano: " << endl;
                 displayCardsSideBySide(playerHand);
                 cout << "Te has pasado! Pierdes " << bet << " fichas." << endl;
                 playerChips -= bet;
-                SetColor(15); // Blanco
+                SetColor(15); // Blanco  
                 return;
             }
         }
 
-        SetColor(11); // Cyan
+        SetColor(11); // Cyan  
         cout << "Mano del crupier: " << endl;
-        SetColor(15); // Blanco
+        SetColor(15); // Blanco  
         displayCardsSideBySide(dealerHand);
         while (calculateHandValue(dealerHand) < 17) {
             dealerHand.push_back(dealCard());
@@ -178,25 +173,23 @@ public:
         }
 
         cout << "Valor de la mano del crupier: " << calculateHandValue(dealerHand) << endl;
-
         int playerValue = calculateHandValue(playerHand);
         int dealerValue = calculateHandValue(dealerHand);
-
         if (dealerValue > 21 || playerValue > dealerValue) {
-            SetColor(10); // Verde
+            SetColor(10); // Verde  
             cout << "Ganaste! Ganas " << bet << " fichas." << endl;
             playerChips += bet;
         }
         else if (playerValue < dealerValue) {
-            SetColor(12); // Rojo
+            SetColor(12); // Rojo  
             cout << "Perdiste. Pierdes " << bet << " fichas." << endl;
             playerChips -= bet;
         }
         else {
-            SetColor(13); // Magenta
+            SetColor(13); // Magenta  
             cout << "Empate. Recuperas tu apuesta." << endl;
         }
-        SetColor(15); // Blanco
+        SetColor(15); // Blanco  
     }
 
     bool canContinue() {
@@ -209,8 +202,8 @@ public:
 };
 
 int main() {
-    setupConsoleUTF8(); // Configura la consola per UTF-8 si està disponible
-    SetColor(10); // Verde
+    setupConsoleUTF8(); // Configura la consola para UTF-8 si está disponible  
+    SetColor(10); // Verde  
     cout << R"(
         ___           ___           ___                       ___           ___     
        /\  \         /\  \         /\  \          ___        /\__\         /\  \    
@@ -224,18 +217,15 @@ int main() {
       \:\__\         /:/  /       \::/  /      \/__/         /:/  /       \::/  /   
        \/__/         \/__/         \/__/                     \/__/         \/__/         
 )" << '\n';
-
-    SetColor(10); // Verde
+    SetColor(10); // Verde  
     cout << "Bienvenido al Blackjack!" << endl;
-    SetColor(15); // Blanco
-
+    SetColor(15); // Blanco  
     Blackjack game;
     char playAgain;
-
     do {
         game.playRound();
         if (!game.canContinue()) {
-            SetColor(12); // Rojo
+            SetColor(12); // Rojo  
             cout << "No puedes seguir jugando. ";
             if (game.getPlayerChips() <= 0) {
                 cout << "Te has quedado sin fichas." << endl;
@@ -248,17 +238,7 @@ int main() {
         cout << "Quieres jugar otra ronda? (s/n): ";
         cin >> playAgain;
     } while (playAgain == 's' || playAgain == 'S');
-
     cout << "Gracias por jugar. Te vas con " << game.getPlayerChips() << " fichas." << endl;
-    SetColor(15); // Blanco
-
+    SetColor(15); // Blanco  
     return 0;
 }
-
-
-
-
-
-
-
-
