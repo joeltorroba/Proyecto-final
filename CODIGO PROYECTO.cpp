@@ -45,7 +45,7 @@ private:
     int bet;
 
     void initializeDeck() {
-        vector<string> suits = { "C", "D", "T", "P" }; // Cors, Diamants, Trèvols, Piques  
+        vector<string> suits = { "C", "D", "T", "P" }; // Corazones, Diamantes, Trevoles, Picas  
         vector<string> ranks = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
         for (const auto& suit : suits) {
             for (int i = 0; i < ranks.size(); ++i) {
